@@ -1,5 +1,6 @@
 package com.trilead.ssh2.packets;
 
+import java.nio.charset.StandardCharsets;
 
 /**
  * PacketSessionExecCommand.
@@ -31,7 +32,9 @@ public class PacketSessionExecCommand
 			tw.writeUINT32(recipientChannelID);
 			tw.writeString("exec");
 			tw.writeBoolean(wantReply);
-			tw.writeString(command);
+			// Servers hand the command to a shell that reads UTF-8; writeString(String) would send ISO-8859-1.
+			byte[] commandBytes = command.getBytes(StandardCharsets.UTF_8);
+			tw.writeString(commandBytes, 0, commandBytes.length);
 			payload = tw.getBytes();
 		}
 		return payload;
