@@ -208,6 +208,24 @@ class PEMEncoderTest {
 		assertKeysEqual(original, decoded);
 	}
 
+	/**
+	 * The encoder must use the same passphrase bytes as the decoder, which reads OpenSSL's (see
+	 * PEMDecoderTest.testRSATraditionalPEMAES128Utf8Password): the passphrase's UTF-8 bytes.
+	 */
+	@Test
+	void testRoundTripRSAUtf8Password() throws Exception {
+		KeyPair original = loadKeyPair("pem_rsa_2048", null);
+
+		String encoded = PEMEncoder.encodeRSAPrivateKey(
+				(RSAPrivateCrtKey) original.getPrivate(),
+				"árvíztűrő tükörfúrógép",
+				PEMEncoder.AES_128_CBC);
+		KeyPair decoded = PEMDecoder.decode(encoded.toCharArray(), "árvíztűrő tükörfúrógép");
+
+		assertEquals(original.getPrivate(), decoded.getPrivate());
+		assertEquals(original.getPublic(), decoded.getPublic());
+	}
+
 	private KeyPair loadKeyPair(String name, String password) throws Exception {
 		String path = TEST_RESOURCES + name;
 		byte[] keyData = Files.readAllBytes(Paths.get(path));

@@ -125,4 +125,18 @@ public class PEMDecoderTest {
 		assertNotNull(kp.getPrivate());
 		assertNotNull(kp.getPublic());
 	}
+
+	/**
+	 * OpenSSL and OpenSSH derive the key from the passphrase's UTF-8 bytes. This fixture is pem_rsa_2048 encrypted
+	 * with {@code openssl rsa -traditional -aes128 -passout 'pass:árvíztűrő tükörfúrógép'} in a UTF-8 locale.
+	 */
+	@Test
+	public void testRSATraditionalPEMAES128Utf8Password() throws IOException {
+		KeyPair expected = PEMDecoder.decode(getPem("/key-encoder-decoder-tests/pem_rsa_2048"), null);
+		KeyPair actual = PEMDecoder.decode(getPem("/key-encoder-decoder-tests/pem_rsa_2048_aes128_utf8"),
+				"árvíztűrő tükörfúrógép");
+
+		assertEquals(expected.getPrivate(), actual.getPrivate());
+		assertEquals(expected.getPublic(), actual.getPublic());
+	}
 }

@@ -8,8 +8,8 @@ import com.trilead.ssh2.crypto.keys.Ed25519PrivateKey;
 import com.trilead.ssh2.signature.ECDSASHA2Verify;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.DigestException;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -320,12 +320,7 @@ public class PEMEncoder {
 		sb.append("-----BEGIN ").append(type).append("-----\n");
 
 		if (password != null && !password.isEmpty()) {
-			byte[] passwordBytes;
-			try {
-				passwordBytes = password.getBytes("ISO-8859-1");
-			} catch (UnsupportedEncodingException e) {
-				passwordBytes = password.getBytes();
-			}
+			byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
 
 			int blockSize = getBlockSize(algorithm);
 
